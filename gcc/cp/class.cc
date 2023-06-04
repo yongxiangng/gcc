@@ -254,6 +254,7 @@ build_base_path (enum tree_code code,
 		 int nonnull,
 		 tsubst_flags_t complain)
 {
+  printf("BUILD_BASE_PATH\n");
   tree v_binfo = NULL_TREE;
   tree d_binfo = NULL_TREE;
   tree probe;
@@ -8048,6 +8049,7 @@ fixed_type_or_null (tree instance, int *nonnull, int *cdtorp)
 int
 resolves_to_fixed_type_p (tree instance, int* nonnull)
 {
+  printf("resolves_to_fixed_type_p\n\n");
   tree t = TREE_TYPE (instance);
   int cdtorp = 0;
   tree fixed;

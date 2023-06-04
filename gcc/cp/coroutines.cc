@@ -662,6 +662,7 @@ coro_build_promise_expression (tree fn, tree promise_obj, tree member_id,
 			       location_t loc, vec<tree, va_gc> **args,
 			       bool musthave)
 {
+  printf("coro_build_promise_expression\n");
   tree meth = lookup_promise_method (fn, member_id, loc, musthave);
   if (meth == error_mark_node)
     return error_mark_node;

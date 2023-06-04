@@ -8957,6 +8957,7 @@ get_tuple_element_type (tree type, unsigned i)
 static tree
 get_tuple_decomp_init (tree decl, unsigned i)
 {
+  printf("get_tuple_decomp_init\n");
   tree targs = make_tree_vec (1);
   TREE_VEC_ELT (targs, 0) = build_int_cst (integer_type_node, i);
 
@@ -8994,6 +8995,7 @@ get_tuple_decomp_init (tree decl, unsigned i)
   if (use_member_get)
     {
       fns = lookup_template_function (fns, targs);
+      printf("Calling build_new_method_call from get tuple element\n");
       return build_new_method_call (e, fns, /*args*/NULL,
 				    /*path*/NULL_TREE, LOOKUP_NORMAL,
 				    /*fn_p*/NULL, tf_warning_or_error);

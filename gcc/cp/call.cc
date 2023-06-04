@@ -4998,6 +4998,7 @@ tree
 build_new_function_call (tree fn, vec<tree, va_gc> **args,
 			 tsubst_flags_t complain)
 {
+  printf("BUILD_NEW_FUNCTION_CALL\n");
   struct z_candidate *candidates, *cand;
   bool any_viable_p;
   void *p;
@@ -5071,6 +5072,7 @@ build_operator_new_call (tree fnname, vec<tree, va_gc> **args,
 			 tree align_arg, tree size_check,
 			 tree *fn, tsubst_flags_t complain)
 {
+  printf("BUILD_OPERATOR_NEW_CALL\n");
   tree original_size = *size;
   tree fns;
   struct z_candidate *candidates;
@@ -5215,6 +5217,7 @@ keep_unused_object_arg (tree result, tree obj, tree fn)
 tree
 build_op_call (tree obj, vec<tree, va_gc> **args, tsubst_flags_t complain)
 {
+   printf("BUIlD_OP_CALL\n");
   struct z_candidate *candidates = 0, *cand;
   tree fns, convs, first_mem_arg = NULL_TREE;
   bool any_viable_p;
@@ -7414,6 +7417,7 @@ build_op_subscript (const op_location_t &loc, tree obj,
 		    vec<tree, va_gc> **args, tree *overload,
 		    tsubst_flags_t complain)
 {
+   printf("BUILD_OP_SUBSCRIPT\n");
   struct z_candidate *candidates = 0, *cand;
   tree fns, first_mem_arg = NULL_TREE;
   bool any_viable_p;
@@ -7701,6 +7705,7 @@ build_op_delete_call (enum tree_code code, tree addr, tree size,
 		      bool global_p, tree placement,
 		      tree alloc_fn, tsubst_flags_t complain)
 {
+  // printf("BUILD_OP_DELETE_CALL\n");
   tree fn = NULL_TREE;
   tree fns, fnname, type, t;
   dealloc_info di_fn = { };
@@ -8279,6 +8284,7 @@ convert_like_internal (conversion *convs, tree expr, tree fn, int argnum,
 		       bool issue_conversion_warnings, bool c_cast_p,
 		       bool nested_p, tsubst_flags_t complain)
 {
+   printf("CONVERT_LIKE_INTERNAL\n");
   tree totype = convs->type;
   diagnostic_t diag_kind;
   int flags;
@@ -8406,6 +8412,7 @@ convert_like_internal (conversion *convs, tree expr, tree fn, int argnum,
     case ck_user:
       {
 	struct z_candidate *cand = convs->cand;
+  // printf("IS_NULL %s\n", cand == NULL ? "YES" : "NO");
 
 	if (cand == NULL)
 	  /* We chose the surrogate function from add_conv_candidate, now we
@@ -8467,6 +8474,7 @@ convert_like_internal (conversion *convs, tree expr, tree fn, int argnum,
 
 	/* Pass LOOKUP_NO_CONVERSION so rvalue/base handling knows not to allow
 	   any more UDCs.  */
+  // printf("I'm calling here\n");
 	expr = build_over_call (cand, LOOKUP_NORMAL|LOOKUP_NO_CONVERSION,
 				complain);
 
@@ -9398,12 +9406,14 @@ mark_versions_used (tree fn)
 static tree
 call_copy_ctor (tree a, tsubst_flags_t complain)
 {
+  printf("CALL_COPY_CTOR\n");
   tree ctype = TYPE_MAIN_VARIANT (TREE_TYPE (a));
   tree binfo = TYPE_BINFO (ctype);
   tree copy = get_copy_ctor (ctype, complain);
   copy = build_baselink (binfo, binfo, copy, NULL_TREE);
   tree ob = build_dummy_object (ctype);
   releasing_vec args (make_tree_vector_single (a));
+  printf("Calling build_new_method_call from call_copy_ctor\n");
   tree r = build_new_method_call (ob, copy, &args, NULL_TREE,
 				  LOOKUP_NORMAL, NULL, complain);
   return r;
@@ -9734,6 +9744,7 @@ immediate_invocation_p (tree fn)
 static tree
 build_over_call (struct z_candidate *cand, int flags, tsubst_flags_t complain)
 {
+  printf("BUILD_OVER_CALL\n");
   tree fn = cand->fn;
   const vec<tree, va_gc> *args = cand->args;
   tree first_arg = cand->first_arg;
@@ -9961,6 +9972,7 @@ build_over_call (struct z_candidate *cand, int flags, tsubst_flags_t complain)
   /* Bypass access control for 'this' parameter.  */
   else if (TREE_CODE (TREE_TYPE (fn)) == METHOD_TYPE)
     {
+     printf("METHOD_TYPE fffffffffffffffff %s\n", first_arg != NULL_TREE ? "first arg not null" : "first arg null");
       tree arg = build_this (first_arg != NULL_TREE
 			     ? first_arg
 			     : (*args)[arg_index]);
@@ -11046,6 +11058,14 @@ tree
 build_special_member_call (tree instance, tree name, vec<tree, va_gc> **args,
 			   tree binfo, int flags, tsubst_flags_t complain)
 {
+   printf("BUILDING SPECIAL\n");
+   printf("Name %s\n", IDENTIFIER_CTOR_P (name)
+    ? "CTOR"
+    : IDENTIFIER_DTOR_P(name)
+    ? "DTOR"
+    : name == assign_op_identifier
+    ? "Assign"
+    : "Ukn");
   tree fns;
   /* The type of the subobject to be constructed or destroyed.  */
   tree class_type;
@@ -11176,7 +11196,7 @@ build_special_member_call (tree instance, tree name, vec<tree, va_gc> **args,
 
       vec_safe_insert (*args, 0, sub_vtt);
     }
-
+  printf("Calling build_new_method_call from build special member\n");
   ret = build_new_method_call (instance, fns, args,
 			       TYPE_BINFO (BINFO_TYPE (binfo)),
 			       flags, /*fn=*/NULL,
@@ -11371,6 +11391,12 @@ build_new_method_call (tree instance, tree fns, vec<tree, va_gc> **args,
 		       tree conversion_path, int flags,
 		       tree *fn_p, tsubst_flags_t complain)
 {
+   printf("BUILD_NEW_METHOD_CALL\n");
+   printf("Instance = %s\n", TYPE_NAME_STRING( TREE_TYPE(instance)));
+//   printf("%s\n", fns->name());
+//   printf("fns = %s\n", TYPE_NAME_STRING( TREE_TYPE(fns)));
+//   printf("name=%s\n", TYPE_NAME_STRING (DECL_NAME ( OVL_FIRST(fns))));
+  // printf("INSTANCE %d\n", TREE_CODE (instance));
   struct z_candidate *candidates = 0, *cand;
   tree explicit_targs = NULL_TREE;
   tree basetype = NULL_TREE;
@@ -11699,6 +11725,7 @@ build_new_method_call (tree instance, tree fns, vec<tree, va_gc> **args,
 	      if (fn_p)
 		*fn_p = fn;
 	      /* Build the actual CALL_EXPR.  */
+         printf("call build over call from build_new_method_call\n");
 	      call = build_over_call (cand, flags, complain);
 
 	      /* Suppress warnings for if (my_struct.operator= (x)) where
@@ -14043,6 +14070,7 @@ static tree
 extend_ref_init_temps_1 (tree decl, tree init, vec<tree, va_gc> **cleanups,
 			 tree *cond_guard)
 {
+  // printf("EXTEND_REF_INIT_TEMPS_1\n");
   /* CWG1299 (C++20): The temporary object to which the reference is bound or
      the temporary object that is the complete object of a subobject to which
      the reference is bound persists for the lifetime of the reference if the

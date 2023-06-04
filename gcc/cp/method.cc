@@ -1935,6 +1935,7 @@ static tree
 locate_fn_flags (tree type, tree name, tree argtype, int flags,
 		 tsubst_flags_t complain)
 {
+  printf("LOCATE_FN_FLAGS\n");
   tree ob, fn, fns, binfo, rval;
 
   if (TYPE_P (type))
@@ -1967,6 +1968,7 @@ locate_fn_flags (tree type, tree name, tree argtype, int flags,
     }
 
   fns = lookup_fnfields (binfo, name, 0, complain);
+  printf("Calling build new method call from locate fn flags\n");
   rval = build_new_method_call (ob, fns, &args, binfo, flags, &fn, complain);
 
   if (fn && rval == error_mark_node)
@@ -1980,6 +1982,7 @@ locate_fn_flags (tree type, tree name, tree argtype, int flags,
 tree
 get_dtor (tree type, tsubst_flags_t complain)
 {
+   printf("GET_DTOR\n");
   tree fn = locate_fn_flags (type, complete_dtor_identifier, NULL_TREE,
 			     LOOKUP_NORMAL, complain);
   if (fn == error_mark_node)
@@ -1992,6 +1995,7 @@ get_dtor (tree type, tsubst_flags_t complain)
 tree
 locate_ctor (tree type)
 {
+   printf("LOCATE_CTOR\n");
   tree fn;
 
   push_deferring_access_checks (dk_no_check);
@@ -2008,6 +2012,7 @@ locate_ctor (tree type)
 tree
 get_default_ctor (tree type)
 {
+   printf("GET_DEFAULT_CTOR\n");
   tree fn = locate_fn_flags (type, complete_ctor_identifier, NULL_TREE,
 			     LOOKUP_NORMAL, tf_warning_or_error);
   if (fn == error_mark_node)
@@ -2020,6 +2025,7 @@ get_default_ctor (tree type)
 tree
 get_copy_ctor (tree type, tsubst_flags_t complain)
 {
+   printf("GET_COPY_CTOR\n");
   int quals = (TYPE_HAS_CONST_COPY_CTOR (type)
 	       ? TYPE_QUAL_CONST : TYPE_UNQUALIFIED);
   tree argtype = build_stub_type (type, quals, false);
@@ -2035,6 +2041,7 @@ get_copy_ctor (tree type, tsubst_flags_t complain)
 tree
 get_copy_assign (tree type)
 {
+   printf("GET_COPY_ASSIGN\n");
   int quals = (TYPE_HAS_CONST_COPY_ASSIGN (type)
 	       ? TYPE_QUAL_CONST : TYPE_UNQUALIFIED);
   tree argtype = build_stub_type (type, quals, false);
@@ -2386,6 +2393,7 @@ walk_field_subobs (tree fields, special_function_kind sfk, tree fnname,
 		   bool diag, int flags, tsubst_flags_t complain,
 		   bool dtor_from_ctor)
 {
+   printf("WALK_FIELD_SUBOBS\n");
   if (!fields)
     return;
 
@@ -2578,6 +2586,7 @@ synthesized_method_base_walk (tree binfo, tree base_binfo,
 			      tree *spec_p, bool *trivial_p,
 			      bool *deleted_p, bool *constexpr_p)
 {
+   printf("SYNTHESIZED_METHOD_BASE_WALK\n");
   bool inherited_binfo = false;
   tree argtype = NULL_TREE;
   deferring_kind defer = dk_no_deferred;
@@ -2649,6 +2658,7 @@ synthesized_method_walk (tree ctype, special_function_kind sfk, bool const_p,
 			 bool *constexpr_p, bool diag,
 			 tree *inheriting_ctor, tree inherited_parms)
 {
+   printf("SYNTHESIZED_METHOD_WALK\n");
   tree binfo, base_binfo;
   int i;
 
@@ -2853,6 +2863,7 @@ synthesized_method_walk (tree ctype, special_function_kind sfk, bool const_p,
 tree
 get_defaulted_eh_spec (tree decl, tsubst_flags_t complain)
 {
+  // printf("GET_DEFAULTED_EH_SPEC\n");
   /* For DECL_MAYBE_DELETED this should already have been handled by
      synthesize_method.  */
   gcc_assert (!DECL_MAYBE_DELETED (decl));
@@ -2886,6 +2897,7 @@ get_defaulted_eh_spec (tree decl, tsubst_flags_t complain)
 bool
 maybe_explain_implicit_delete (tree decl)
 {
+  // printf("MAYBE_EXPLAIN_IMPLICIT_DELETE\n");
   /* If decl is a clone, get the primary variant.  */
   decl = DECL_ORIGIN (decl);
   gcc_assert (DECL_DELETED_FN (decl));
@@ -3001,6 +3013,7 @@ maybe_explain_implicit_delete (tree decl)
 void
 explain_implicit_non_constexpr (tree decl)
 {
+  // printf("EXPLAIN_IMPLICIT_NON_CONSTEXPR\n");
   tree parms = FUNCTION_FIRST_USER_PARMTYPE (decl);
   bool const_p = CP_TYPE_CONST_P (non_reference (TREE_VALUE (parms)));
   tree inh = DECL_INHERITED_CTOR (decl);
@@ -3026,6 +3039,7 @@ explain_implicit_non_constexpr (tree decl)
 bool
 deduce_inheriting_ctor (tree decl)
 {
+  // printf("DEDUCE_INHERITING_CTOR\n");
   decl = DECL_ORIGIN (decl);
   gcc_assert (DECL_INHERITED_CTOR (decl));
   tree spec;
@@ -3067,6 +3081,7 @@ implicitly_declare_fn (special_function_kind kind, tree type,
 		       bool const_p, tree pattern_fn,
 		       tree inherited_parms)
 {
+  // printf("IMPLICITLY_DECLARE_FN\n");
   tree fn;
   tree parameter_types = void_list_node;
   tree return_type;

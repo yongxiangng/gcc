@@ -2710,6 +2710,7 @@ tree
 finish_call_expr (tree fn, vec<tree, va_gc> **args, bool disallow_virtual,
 		  bool koenig_p, tsubst_flags_t complain)
 {
+  printf("finish_call_expr\n");
   tree result;
   tree orig_fn;
   vec<tree, va_gc> *orig_args = *args;
@@ -2789,6 +2790,7 @@ finish_call_expr (tree fn, vec<tree, va_gc> **args, bool disallow_virtual,
       if (BASELINK_P (member))
 	{
 	  tree object = TREE_OPERAND (fn, 0);
+    printf("calling build_new_method_call from finish_call_expr\n");
 	  return build_new_method_call (object, member,
 					args, NULL_TREE,
                                         (disallow_virtual
@@ -2841,7 +2843,7 @@ finish_call_expr (tree fn, vec<tree, va_gc> **args, bool disallow_virtual,
       else
 	object = maybe_dummy_object (BINFO_TYPE (BASELINK_ACCESS_BINFO (fn)),
 				     NULL);
-
+      printf("calling build_new_method_call from finish_call_expr\n");
       result = build_new_method_call (object, fn, args, NULL_TREE,
 				      (disallow_virtual
 				       ? LOOKUP_NORMAL|LOOKUP_NONVIRTUAL

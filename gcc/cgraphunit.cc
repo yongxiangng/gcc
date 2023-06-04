@@ -1152,6 +1152,7 @@ static varpool_node *first_analyzed_var;
 static void
 analyze_functions (bool first_time)
 {
+//  printf("analyze_functions\n");
   /* Keep track of already processed nodes when called multiple times for
      intermodule optimization.  */
   cgraph_node *first_handled = first_analyzed;
@@ -1184,6 +1185,7 @@ analyze_functions (bool first_time)
 
   /* Analysis adds static variables that in turn adds references to new functions.
      So we need to iterate the process until it stabilize.  */
+//  printf("Before changed\n");
   while (changed)
     {
       changed = false;
@@ -1323,6 +1325,7 @@ analyze_functions (bool first_time)
 	  symtab->process_new_functions ();
 	}
     }
+//  printf("After changed\n");
   update_type_inheritance_graph ();
 
   /* Collect entry points to the unit.  */
@@ -1419,6 +1422,7 @@ analyze_functions (bool first_time)
     symtab->symtab_initialize_asm_name_hash ();
 
   input_location = saved_loc;
+//  printf("Exit: analyze_functions\n");
 }
 
 /* Check declaration of the type of ALIAS for compatibility with its TARGET
@@ -2524,6 +2528,7 @@ debuginfo_early_stop (void)
 void
 symbol_table::finalize_compilation_unit (void)
 {
+  // printf("Finalize compilation unit\n");
   timevar_push (TV_CGRAPH);
 
   /* If we're here there's no current function anymore.  Some frontends

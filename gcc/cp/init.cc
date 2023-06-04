@@ -537,6 +537,7 @@ build_value_init_noctor (tree type, tsubst_flags_t complain)
 static tree
 perform_target_ctor (tree init)
 {
+  // printf(("PERFORM_TARGET_CTOR\n");
   tree decl = current_class_ref;
   tree type = current_class_type;
 
@@ -938,6 +939,7 @@ find_uninit_fields (tree *t, hash_set<tree> *uninitialized, tree member)
 static void
 perform_member_init (tree member, tree init, hash_set<tree> &uninitialized)
 {
+  // printf(("PERFORM_MEMBER_INIT");
   tree decl;
   tree type = TREE_TYPE (member);
 
@@ -1684,6 +1686,7 @@ expand_virtual_init (tree binfo, tree decl)
 static void
 expand_cleanup_for_base (tree binfo, tree flag)
 {
+  // printf(("EXPAND_CLEANUP_FOR_BASE\n");
   tree expr;
 
   if (!type_build_dtor_call (BINFO_TYPE (binfo)))
@@ -3018,6 +3021,7 @@ build_new_1 (vec<tree, va_gc> **placement, tree type, tree nelts,
 	     vec<tree, va_gc> **init, bool globally_qualified_p,
 	     tsubst_flags_t complain)
 {
+  printf("BUILD_NEW_1\n");
   tree size, rval;
   /* True iff this is a call to "operator new[]" instead of just
      "operator new".  */
@@ -3382,6 +3386,7 @@ build_new_1 (vec<tree, va_gc> **placement, tree type, tree nelts,
 	{
 	  vec<tree, va_gc> *align_args
 	    = vec_copy_and_insert (*placement, align_arg, 1);
+    printf("Calling build new method call from build new\n");
 	  alloc_call
 	    = build_new_method_call (dummy, fns, &align_args,
 				     /*conversion_path=*/NULL_TREE,
@@ -3394,10 +3399,13 @@ build_new_1 (vec<tree, va_gc> **placement, tree type, tree nelts,
 	    alloc_call = NULL_TREE;
 	}
       if (!alloc_call)
-	alloc_call = build_new_method_call (dummy, fns, placement,
-					    /*conversion_path=*/NULL_TREE,
-					    LOOKUP_NORMAL,
-					    &alloc_fn, complain);
+      {
+        printf("Calling build new method cal from build_new_1\n");
+        alloc_call = build_new_method_call(dummy, fns, placement,
+          /*conversion_path=*/NULL_TREE,
+                                           LOOKUP_NORMAL,
+                                           &alloc_fn, complain);
+      }
     }
   else
     {
@@ -4048,6 +4056,7 @@ build_vec_delete_1 (location_t loc, tree base, tree maxindex, tree type,
 		    int use_global_delete, tsubst_flags_t complain,
 		    bool in_cleanup = false)
 {
+  // printf(("BUILD_VEC_DELETE_1\n");
   tree virtual_size;
   tree ptype = build_pointer_type (type = complete_type (type));
   tree size_exp;
@@ -4111,8 +4120,9 @@ build_vec_delete_1 (location_t loc, tree base, tree maxindex, tree type,
       /* Make sure the destructor is callable.  */
       if (type_build_dtor_call (type))
 	{
+        // // printf(("AAAAAAAAAA\n");
 	  tmp = build_delete (loc, ptype, base, sfk_complete_destructor,
-			      LOOKUP_NORMAL|LOOKUP_DESTRUCTOR, 1,
+			      LOOKUP_NORMAL|LOOKUP_DESTRUCTOR|LOOKUP_NONVIRTUAL, 1,
 			      complain);
 	  if (tmp == error_mark_node)
 	    return error_mark_node;
@@ -4142,8 +4152,9 @@ build_vec_delete_1 (location_t loc, tree base, tree maxindex, tree type,
   if (tmp == error_mark_node)
     return error_mark_node;
   body = build_compound_expr (loc, body, tmp);
+  // // printf(("BBBBBBBBB\n");
   tmp = build_delete (loc, ptype, tbase, sfk_complete_destructor,
-		      LOOKUP_NORMAL|LOOKUP_DESTRUCTOR, 1,
+		      LOOKUP_NORMAL|LOOKUP_DESTRUCTOR|LOOKUP_NONVIRTUAL, 1,
 		      complain);
   if (tmp == error_mark_node)
     return error_mark_node;
@@ -5037,6 +5048,7 @@ static tree
 build_dtor_call (tree exp, special_function_kind dtor_kind, int flags,
 		 tsubst_flags_t complain)
 {
+  // printf(("BUILD_DTOR_CALL\n");
   tree name;
   switch (dtor_kind)
     {
@@ -5077,6 +5089,7 @@ build_delete (location_t loc, tree otype, tree addr,
 	      special_function_kind auto_delete,
 	      int flags, int use_global_delete, tsubst_flags_t complain)
 {
+  // printf(("BUILD_DELETE\n");
   tree expr;
 
   if (addr == error_mark_node)
@@ -5094,6 +5107,7 @@ build_delete (location_t loc, tree otype, tree addr,
 
   if (TREE_CODE (type) == ARRAY_TYPE)
     {
+    // printf(("BUILD_DELETE_ARRAY_TYPE\n");
       if (TYPE_DOMAIN (type) == NULL_TREE)
 	{
 	  if (complain & tf_error)
@@ -5109,6 +5123,7 @@ build_delete (location_t loc, tree otype, tree addr,
 
   if (TYPE_PTR_P (otype))
     {
+    // printf(("O_TYPE_PTR_TYPE\n");
       addr = mark_rvalue_use (addr);
 
       /* We don't want to warn about delete of void*, only other
@@ -5185,10 +5200,13 @@ build_delete (location_t loc, tree otype, tree addr,
   bool virtual_p = false;
   if (type_build_dtor_call (type))
     {
+    // printf(("BUILD_TYPE_DTOR_CALL\n");
       if (CLASSTYPE_LAZY_DESTRUCTOR (type))
 	lazily_declare_fn (sfk_destructor, type);
       virtual_p = DECL_VIRTUAL_P (CLASSTYPE_DESTRUCTOR (type));
+      // printf(("IS_VIRTUAL_P %s\n", virtual_p ? "YES" : "NO");
     }
+//  virtual_p = false;
 
   tree head = NULL_TREE;
   tree do_delete = NULL_TREE;
@@ -5203,6 +5221,7 @@ build_delete (location_t loc, tree otype, tree addr,
      delete'.  */
   else if (use_global_delete)
     {
+    // printf(("GLOBAL_DELETE\n");
       head = get_target_expr (build_headof (addr));
       /* Delete the object.  */
       do_delete = build_op_delete_call (DELETE_EXPR,
@@ -5222,6 +5241,7 @@ build_delete (location_t loc, tree otype, tree addr,
   else if (!virtual_p)
     {
       /* Build the call.  */
+      // printf(("NOT VIRTUAL_P\n");
       do_delete = build_op_delete_call (DELETE_EXPR,
 					addr,
 					cxx_sizeof_nowarn (type),
@@ -5239,6 +5259,7 @@ build_delete (location_t loc, tree otype, tree addr,
     }
   else if (TYPE_GETS_REG_DELETE (type))
     {
+    // printf(("TYPE_GET_REG_DELETE\n");
       /* Make sure we have access to the member op delete, even though
 	 we'll actually be calling it from the destructor.  */
       build_op_delete_call (DELETE_EXPR, addr, cxx_sizeof_nowarn (type),
@@ -5252,8 +5273,11 @@ build_delete (location_t loc, tree otype, tree addr,
     /* The operator delete will call the destructor.  */
     expr = addr;
   else if (type_build_dtor_call (type))
+  {
+    // printf(("TYPE_BUILD_DTOR_CALL\n");
     expr = build_dtor_call (cp_build_fold_indirect_ref (addr),
-			    auto_delete, flags, complain);
+                            auto_delete, flags, complain);
+  }
   else
     expr = build_trivial_dtor_call (addr);
   if (expr == error_mark_node)
@@ -5311,6 +5335,7 @@ build_delete (location_t loc, tree otype, tree addr,
 void
 push_base_cleanups (void)
 {
+  // printf(("PUSH_BASE_CLEANUPS\n");
   tree binfo, base_binfo;
   int i;
   tree member;
@@ -5419,6 +5444,7 @@ build_vec_delete (location_t loc, tree base, tree maxindex,
 		  special_function_kind auto_delete_vec,
 		  int use_global_delete, tsubst_flags_t complain)
 {
+  // printf(("BUILD_VEC_DELETE\n");
   tree type;
   tree rval;
   tree base_init = NULL_TREE;
@@ -5427,6 +5453,7 @@ build_vec_delete (location_t loc, tree base, tree maxindex,
 
   if (TYPE_PTR_P (type))
     {
+    // printf(("PTR_TYPE\n");
       /* Step back one from start of vector, and read dimension.  */
       tree cookie_addr;
       tree size_ptr_type = build_pointer_type (sizetype);
@@ -5446,6 +5473,7 @@ build_vec_delete (location_t loc, tree base, tree maxindex,
     }
   else if (TREE_CODE (type) == ARRAY_TYPE)
     {
+    // printf(("ARRAY_TYPE\n");
       /* Get the total number of things in the array, maxindex is a
 	 bad name.  */
       maxindex = array_type_nelts_total (type);

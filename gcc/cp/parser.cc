@@ -7967,10 +7967,25 @@ cp_parser_postfix_expression (cp_parser *parser, bool address_p, bool cast_p,
 		  }
 		else if (BASELINK_P (fn))
 		  {
+                  bool is_array_access = false;
+		  if (TREE_CODE (instance) == ARRAY_REF)
+		      is_array_access = true;
+		  if (INDIRECT_REF_P (instance))
+		  {
+		      tree expr = TREE_OPERAND (instance, 0);
+		      while (TREE_CODE (expr) == COMPOUND_EXPR)
+		      {
+			  expr = TREE_OPERAND (expr, 1);
+		      }
+		      if (TREE_CODE (expr) == POINTER_PLUS_EXPR)
+		      {
+			  is_array_access = true;
+		      }
+		  }
 		  postfix_expression
 		    = (build_new_method_call
 		       (instance, fn, &args, NULL_TREE,
-			(idk == CP_ID_KIND_QUALIFIED
+			(idk == CP_ID_KIND_QUALIFIED || is_array_access
 			 ? LOOKUP_NORMAL|LOOKUP_NONVIRTUAL
 			 : LOOKUP_NORMAL),
 			/*fn_p=*/NULL,
